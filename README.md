@@ -1,1 +1,3 @@
-# deltabrowser
+# Deltabrowser
+
+A learning django project
