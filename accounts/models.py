@@ -6,6 +6,47 @@ from django.contrib.auth.models import(
 )
 
 
+class UserManager(BaseUserManager):
+    def create_user(self, email, password=None):
+        """
+        Creates and save a User with the given email and password
+        """
+        if not email:
+            raise ValueError('Users must have an email')
+        
+        user = self.model(
+            email = self.normalize_email(email),
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_staffuser(self, email, password):
+        """
+        Creates and save a User with the given email and password
+        """
+        user = self.create_user(
+            email,
+            password=password,
+        )
+        user.staff=True
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password):
+        """
+        Creates and save a User with the given email and password
+        """
+        user = self.create_user(
+            email,
+            password=password,
+        )
+        user.staff=True
+        user.admin=True
+        user.save(using=self._db)
+        return user
+
+
 class User(AbstractBaseUser):
     email = models.EmailField(
         verbose_name='email address',
@@ -49,47 +90,5 @@ class User(AbstractBaseUser):
     @property
     def is_active(self):
         return self.active
-
+    
     objects = UserManager()
-
-
-
-class UserManager(BaseUserManager):
-    def create_user(self, email, password=None):
-        """
-        Creates and save a User with the given email and password
-        """
-        if not email:
-            raise ValueError('Users must have an email')
-        
-        user = self.model(
-            email = self.normalize_email(email),
-        )
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create staff_user(self, email, password):
-        """
-        Creates and save a User with the given email and password
-        """
-        user = self.create_user(
-            email,
-            password=password,
-        )
-        user.staff=True
-        user.save(using=self._db)
-        return user
-
-    def crate super_user(self, email, password):
-        """
-        Creates and save a User with the given email and password
-        """
-        user = self.create_user(
-            email,
-            password=password,
-        )
-        user.staff=True
-        user.admin=True
-        user.save(using=self._db)
-        return user
